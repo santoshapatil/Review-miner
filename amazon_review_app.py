@@ -99,7 +99,7 @@ def getReviews(url,pg):
           return r_h,r_b,r_t,npg
 
 @app.route('/Review_extract',methods=['POST'])
-def Review_extract
+def Review_extract:
 	if request.method == 'POST':
 		message = request.form['message']
 		p = [message]
