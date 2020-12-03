@@ -26,25 +26,22 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.externals import joblib
 
-app = Flask(__name__)
-
-@app.route('/')
-def home():
-	return render_template('home.html')
-
-
-
-
 def getReview_link(s,u):
   if s !="stop":
-    soup= BeautifulSoup(page.content, 'html.parser')
+    cookie = {}
+    header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'}
+    uu=requests.get(u,cookies=cookie,headers=header)
+    soup= BeautifulSoup(uu.content, 'html.parser')
     rev=soup.find('div',id="reviews-medley-footer")
     t=rev.find('a').get('href')
     r_u="https://www.amazon.in"+t+"&sortBy=recent"
     return r_u
 
 def getReviews(url,pg):
- 
+  cookie = {}
+  header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'}
+
+
   ur=url+"&pageNumber="+str(pg)+"&sortBy=recent"
   page = requests.get(ur,cookies=cookie,headers=header)
   r_h=[]
@@ -95,14 +92,24 @@ def getReviews(url,pg):
         return r_h,r_b,r_t,npg
       elif (nextp.find("li",class_="a-last")) is not None:
           
-          npg=pg+1
-          return r_h,r_b,r_t,npg
+        npg=pg+1
+        return r_h,r_b,r_t,npg
+
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+	return render_template('home.html')
+
 
 @app.route('/Review_extract',methods=['POST'])
-def Review_extract:
+
+def Review_extract():
 	if request.method == 'POST':
-		message = request.form['message']
-		p = [message]
+		message = request.form.get('message')
+		p = message
+
 		
 	cookie={}
 	header={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'}
@@ -138,7 +145,7 @@ def Review_extract:
 	Reviews=pd.DataFrame(({"Review_title":H,
          "Review_body":B,
          "Review_date":D}))
-	no_reviews=length(H)
+	no_reviews=len(Reviews)
 	return render_template('result.html',prediction = no_reviews)
 
 if __name__ == '__main__':
