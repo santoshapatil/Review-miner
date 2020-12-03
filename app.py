@@ -15,16 +15,24 @@ Original file is located at
 
 from bs4 import BeautifulSoup
 import requests
-
+import emoji
+import nltk
+import enchant
 import pandas as pd
 from dateutil.parser import parse
-
+import numpy as np
 from flask import Flask,render_template,url_for,request
+from nltk.corpus import stopwords
+nltk.download('stopwords')
 
+from nltk.stem import SnowballStemmer
 import pickle
+from sklearn.cluster import KMeans
+from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.externals import joblib
+import string
 
 def getReview_link(s,u):
   if s !="stop":
